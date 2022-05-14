@@ -48,6 +48,33 @@ def posts():
     return render_template("posts.html", articles=articles)
 
 
+@app.route('/posts/<int:id>/del')
+def posts_delete(id):
+    article = Article.query.get_or_404(id)
+    try:
+        db.session.delete(article)
+        db.session.commit()
+        return redirect('/posts')
+    except:
+        return "Ошибка при удалении статьи"
+
+
+@app.route('/posts/<int:id>/update', methods=['POST', 'GET'])
+def article_update(id):
+    article = Article.query.get(id)
+    if request.method == "POST":
+        article.title = request.form['title']
+        article.intro = request.form['intro']
+        article.text = request.form['text']
+
+        try:
+            db.session.commit()
+            return redirect('/posts')
+        except:
+            return "Ошибка при редактировании статьи"
+    else:
+        return render_template("article_update.html", article=article)
+
 @app.route('/posts/<int:id>')
 def posts_detail(id):
     article = Article.query.get(id)
